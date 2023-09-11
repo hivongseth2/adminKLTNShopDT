@@ -12,24 +12,34 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
-    title: 'user',
+    title: 'Tài khoản',
     path: '/dashboard/user',
     icon: icon('ic_user'),
   },
   {
-    title: 'product',
+    title: 'Sản phẩm',
     path: '/dashboard/products',
     icon: icon('ic_cart'),
   },
-  {
-    title: 'blog',
-    path: '/dashboard/blog',
-    icon: icon('ic_blog'),
-  },
+  // {
+  //   title: 'blog',
+  //   path: '/dashboard/blog',
+  //   icon: icon('ic_blog'),
+  // },
   {
     title: 'login',
     path: '/login',
     icon: icon('ic_lock'),
+  },
+  {
+    title: 'Nhà cung cấp',
+    path: '/dashboard/supplier',
+    icon: icon('ic_supplier'),
+  },
+  {
+    title: 'Loại sản phẩm',
+    path: '/dashboard/category',
+    icon: icon('ic_category'),
   },
   {
     title: 'Not found',
