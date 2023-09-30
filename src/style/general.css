@@ -1,0 +1,12 @@
+.ContainerImgForm {
+    overflow-x: scroll;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+.imgInForm{
+    min-width: 200px; 
+    height: 200px; object-fit: cover 
+}

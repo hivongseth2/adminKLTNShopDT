@@ -22,6 +22,12 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
+
+import Specification from '../view/Specification';
+import ProductForm from '../view/ProductForm';
+
+// search
+
 // components
 import Label from '../components/label';
 import Iconify from '../components/iconify';
@@ -59,8 +65,9 @@ function applySortFilter(array, comparator, query) {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
+  // search theo tieu chi productName
   if (query) {
-    return filter(array, (_user) => _user.lastName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.productName.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -68,7 +75,32 @@ function applySortFilter(array, comparator, query) {
 export default function ProductsPage() {
   const [openFilter, setOpenFilter] = useState(false);
   const [products, setProducts] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [flag, setFlag] = useState(false);
+  const [specEdit, setSpecEdit] = useState(false);
 
+  const trigger = () => {
+    setFlag(!flag);
+  };
+  // form edit
+  const handleEditProduct = () => {
+    setOpen(null);
+
+    setIsEditing(true);
+  };
+  const handleCloseProduct = () => {
+    setIsEditing(false);
+  };
+  // ===============SPECEDIT
+
+  const OpenSpecEdit = () => {
+    setSpecEdit(true);
+  };
+  const CloseSpecEdit = () => {
+    setSpecEdit(false);
+  };
+
+  // ===================
   const handleOpenFilter = () => {
     setOpenFilter(true);
   };
@@ -108,9 +140,9 @@ export default function ProductsPage() {
     };
 
     fetchData();
-  }, []);
+  }, [flag]);
 
-  // ===========
+  // ===========producthandleCloseMenu
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -124,15 +156,19 @@ export default function ProductsPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [editProduct, setEditProduct] = useState(null);
 
-  const handleOpenMenu = (event) => {
+  // ==== menu phu
+  const handleOpenMenu = (event, row) => {
     setOpen(event.currentTarget);
+    setEditProduct(row);
   };
 
   const handleCloseMenu = () => {
     setOpen(null);
+    setEditProduct(null);
   };
-
+  // ===============
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -193,18 +229,27 @@ export default function ProductsPage() {
           <Typography variant="h4" gutterBottom>
             Products
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button
+            onClick={() => {
+              setEditProduct(null);
+              handleEditProduct();
+            }}
+            variant="contained"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+          >
             New Product
           </Button>
         </Stack>
 
         <Card>
-          <ProductFilterSidebar
+          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+
+          {/* <ProductFilterSidebar
             openFilter={openFilter}
             onOpenFilter={handleOpenFilter}
             onCloseFilter={handleCloseFilter}
-          />
-          <ProductSort />
+          /> */}
+          {/* <ProductSort /> */}
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 1000 }}>
@@ -236,7 +281,7 @@ export default function ProductsPage() {
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{brand}</TableCell>
+                        <TableCell align="left">{brand.name}</TableCell>
                         <TableCell align="left">{quantity}</TableCell>
                         <TableCell align="left">{price}</TableCell>
                         <TableCell align="left">{priceImport}</TableCell>
@@ -244,7 +289,7 @@ export default function ProductsPage() {
                         <TableCell align="left">{category.categoryName}</TableCell>
                         <TableCell align="left">{supplier.name}</TableCell>
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(event) => handleOpenMenu(event, row)}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -296,6 +341,61 @@ export default function ProductsPage() {
           />
         </Card>
       </Container>
+
+      <Popover
+        open={Boolean(open)}
+        anchorEl={open}
+        onClose={handleCloseMenu}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: 140,
+            '& .MuiMenuItem-root': {
+              px: 1,
+              typography: 'body2',
+              borderRadius: 0.75,
+            },
+          },
+        }}
+      >
+        <MenuItem onClick={() => handleEditProduct()}>
+          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+          Edit
+        </MenuItem>
+
+        <MenuItem sx={{ color: 'error.main' }}>
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+          Delete
+        </MenuItem>
+
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => OpenSpecEdit()}>
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+          Chỉnh sửa thông số
+        </MenuItem>
+      </Popover>
+
+      {isEditing ? <ProductForm product={editProduct} closeForm={handleCloseProduct} trigger={trigger} /> : null}
+
+      {specEdit ? (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: '30em',
+            position: 'relative',
+            top: '-30em',
+            width: '50%',
+            minHeight: '33vh',
+            zIndex: 3,
+            backgroundColor: '#fff',
+          }}
+        >
+          <Specification product={editProduct} closeForm={CloseSpecEdit} />
+        </div>
+      ) : null}
     </>
   );
 }

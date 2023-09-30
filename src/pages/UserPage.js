@@ -24,6 +24,9 @@ import {
   TablePagination,
 } from '@mui/material';
 // components
+
+import CustomerForm from '../view/CustomerForm';
+
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -81,7 +84,24 @@ function applySortFilter(array, comparator, query) {
 
 export default function UserPage() {
   const [customers, setCustomers] = useState([]); // Sử dụng customers thay vì USERLIST
+  // =================
+  const [isEditing, setIsEditing] = useState(false);
+  const [flag, setFlag] = useState(false);
+  const [editCustomer, setEditCustomer] = useState(null);
+  const trigger = () => {
+    setFlag(!flag);
+  };
+  // form edit
+  const handleEditProduct = () => {
+    setOpen(null);
 
+    setIsEditing(true);
+  };
+  const handleCloseProduct = () => {
+    setIsEditing(false);
+  };
+
+  // ========================
   useEffect(() => {
     const fetchData = async () => {
       const method = 'GET';
@@ -103,7 +123,7 @@ export default function UserPage() {
     };
 
     fetchData(); // Gọi hàm fetchData ngay lập tức khi useEffect được gọi
-  }, []);
+  }, [flag]);
 
   const [open, setOpen] = useState(null);
 
@@ -119,12 +139,15 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = (event, row) => {
     setOpen(event.currentTarget);
+    console.log(row);
+    setEditCustomer(row);
   };
 
   const handleCloseMenu = () => {
     setOpen(null);
+    setEditCustomer(null);
   };
 
   const handleRequestSort = (event, property) => {
@@ -233,7 +256,7 @@ export default function UserPage() {
                         <TableCell align="left">{id}</TableCell>
                         <TableCell align="left">{new Date(dateOfBirth).toLocaleDateString('vi-VN')}</TableCell>
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(event) => handleOpenMenu(event, row)}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -304,7 +327,7 @@ export default function UserPage() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => handleEditProduct()}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Edit
         </MenuItem>
@@ -314,6 +337,8 @@ export default function UserPage() {
           Delete
         </MenuItem>
       </Popover>
+
+      {isEditing ? <CustomerForm user={editCustomer} closeForm={handleCloseProduct} trigger={trigger} /> : null}
     </>
   );
 }
